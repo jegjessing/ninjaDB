@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,13 +26,51 @@ import javax.script.ScriptException;
 
 
 
+
  
 public class NinjaDB extends AbstractHandler
 {
-	
+
+	static final String webroot = "www"; 
+	static final String defaultDocument = "/index.html";
 	static ScriptEngine engine;
 	static int a=0;
+	
+	public static String fileExtention (String fileName) {
+		String extension = "";
 
+		int i = fileName.lastIndexOf('.');
+		if (i > 0) {
+		    extension = fileName.substring(i+1);
+		}
+		return  extension;
+	}
+	
+	public static void serveFile (String rcs, HttpServletResponse response , PrintWriter out) {
+    	
+       	// serve plain files 
+		try {
+			File webFile  = new File(webroot + rcs);
+		    
+			final char[] buffer = new char[4096];
+			FileReader reader = new FileReader(webFile);
+			
+		    int len = 0;
+		    while ((len = reader.read(buffer)) > 0) {
+		        out.write(buffer, 0 , len);
+		    }
+		    reader.close();
+			
+		} catch (FileNotFoundException e) {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		} catch (IOException e) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN );
+		}
+	
+    	
+    }
+	
+	
     public void handle(String target,
                        Request baseRequest,
                        HttpServletRequest request,
@@ -45,19 +84,28 @@ public class NinjaDB extends AbstractHandler
         PrintWriter out = response.getWriter();
         String rcs  = request.getRequestURI();// ; getPathTranslated();// request.getQueryString();
         String qrystr = request.getQueryString();
-        System.out.println(rcs);
+        System.out.println(">" + rcs + "<");
         
-        // Now just return "404" for plain resources
-        if (rcs.equals("/favicon.ico")) {
-        	response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return;	
+        // Default document 
+        if (rcs.equals("/")) {
+        	serveFile (defaultDocument , response , out);
+        	return;
         }
+        
+        
+        // For now: everything except js files is simply server 
+        // !! TODO rather have these files in "ruable" folder or similar
+        if  (false == fileExtention(rcs).equals("js")) {
+        	serveFile (rcs, response , out);
+        	return;
+        }
+ 
         
         // Run the script engine
 		try {
 			
 			// if (a++ == 0) {
-				File scriptFile = new File("www" + rcs);
+				File scriptFile = new File(webroot + rcs);
 		        BufferedReader reader = new BufferedReader(new FileReader(scriptFile));
 	
 				// evaluate JavaScript code that defines a function with one parameter
@@ -93,7 +141,7 @@ public class NinjaDB extends AbstractHandler
         engine = new ScriptEngineManager().getEngineByName("nashorn");
     	
         // Just simple hard-code for test purposes
-        engine.eval("load('www/startup.js');");
+        engine.eval("load('" + webroot + "/startup.js');");
         
     	Server server = new Server(8080);
         server.setHandler(new NinjaDB());
@@ -110,7 +158,7 @@ public class NinjaDB extends AbstractHandler
     	s.append("function exporter() {var exports;");
     	
     	// Run the script engine
-		File scriptFile = new File("www/" + n);
+		File scriptFile = new File(webroot + "/" + n);
 	    
 		final char[] buffer = new char[4096];
 		FileReader reader = new FileReader(scriptFile);

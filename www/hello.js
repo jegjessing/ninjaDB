@@ -12,8 +12,8 @@ function main (out, response, req) {
 
 	p.print('That was deeper');
 	
-	for (var i = 1;i<=1;i++) {
-		out.println( '<br>'  + ':'+ i + ' Hello world!!' + messages + " ...");
+	for (var i = 1; i <= 100 ; i++) {
+		out.println( '<br>'  + ':'+ i + ' Hello world!! My query string is: ' + messages + " ...");
 		console.log(i);
 	}
 }
