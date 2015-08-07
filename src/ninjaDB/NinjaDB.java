@@ -62,8 +62,10 @@ public class NinjaDB extends AbstractHandler
 		    reader.close();
 			
 		} catch (FileNotFoundException e) {
+			out.println(e.getMessage());
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		} catch (IOException e) {
+			out.println(e.getMessage());
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN );
 		}
 	
@@ -84,7 +86,7 @@ public class NinjaDB extends AbstractHandler
         PrintWriter out = response.getWriter();
         String rcs  = request.getRequestURI();// ; getPathTranslated();// request.getQueryString();
         String qrystr = request.getQueryString();
-        System.out.println(">" + rcs + "<");
+        System.out.println(rcs );
         
         // Default document 
         if (rcs.equals("/")) {
@@ -130,8 +132,9 @@ public class NinjaDB extends AbstractHandler
 		} catch (Error | Exception e) {
 		//} catch (ScriptException | NoSuchMethodException e) {
 					// TODO Auto-generated catch block
+			   out.println(e.getMessage());
 			   response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			e.printStackTrace();
+			
 		}
           
     }
