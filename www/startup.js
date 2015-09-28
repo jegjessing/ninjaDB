@@ -1,10 +1,9 @@
 /* Define nija config before anything else*/
 ninja.setPort(8080);
-//ninja.setWebRoot( "/users/nli/Desktop/ext-6.0.0");
 ninja.setWebRoot( "www");
 ninja.setAppRoot( "www");
 
-ninja.setDatabase (
+var con = ninja.dbConnect (
  "com.ibm.as400.access.AS400JDBCDriver",
  "jdbc:as400:DKSRV206",
  "DEMO",
@@ -44,13 +43,13 @@ function router(req, response) {
 // -----------------------------------------------
 var routs = { 
 
-	"/hello" : {
-		get  : function(req, response) {
+	"/helloInline" : {
+		get  : function(req, resp) {
     
-    		var out = response.getWriter();
+    		var out = resp.getWriter();
 	    	var messages = req.getQueryString();
 
-			response.setContentType("text/html;charset=utf-8");
+			resp.setContentType("text/html;charset=utf-8");
 
 			console.log('That was deeper');
 			
@@ -66,11 +65,11 @@ var routs = {
     },
     
     "/sqllist" : {
-		get  : require("sqllist.js")
+		get  : require("sqllist2.js")
     },
     
-    "/myapp" : {
-		get  : require("myapp.js")
+    "/hello" : {
+		get  : require("hello.js")
     },
     
     

@@ -3,11 +3,6 @@
 package ninjaDB;
 
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,17 +12,19 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.*;
 
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.AbstractHandler;
-
-import javax.script.*;
-
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 
  
 public class NinjaDB extends AbstractHandler
@@ -39,14 +36,10 @@ public class NinjaDB extends AbstractHandler
 	static String approot = "./"; 
 	static String defaultDoc = "index.html"; 
 	
-	//static final String webroot = "www"; 
-	
-	
-	// static final String startflr  = "www"; 
-	
+	// class globals
 	static ScriptEngine engine;
 	static Invocable startup;
-	static Connection con;
+	//static Connection con;
 	
 	public static String fileExtention (String fileName) {
 		String extension = "";
@@ -221,11 +214,13 @@ public class NinjaDB extends AbstractHandler
     	
     }
     
-    public static void setDatabase  (String driver , String connection , String user , String pwd) throws Exception
+    public static Connection dbConnect (String driver , String connection , String user , String pwd) throws Exception
     {
+    	Connection con;
      	Class.forName(driver) ;
     	con = DriverManager.getConnection(connection , user , pwd);
-    	engine.put("con", con);
+    	return con;
+    	// engine.put("con", con);
     }
     	
     
