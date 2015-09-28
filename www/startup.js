@@ -1,3 +1,17 @@
+/* To run this on a IBMi :
+
+cd /www;
+export JAVA_HOME=/QopenSys/QIBM/ProdData/JavaVM/jdk80/32bit;
+java -jar ninjadb.jar www/startup.js
+
+Or submitted:
+SBMJOB CMD(QSH CMD('cd /www;export JAVA_HOME=/QopenSys/QIBM/ProdData/JavaVM/jdk80/32bit;java -jar ninjadb.jar     
+             www/startup.js'))                                   
+JOB(NINJA)                                                
+JOBQ(QSYSNOMAX)                                           
+
+-------------------------------------------------- */
+
 /* Define nija config before anything else*/
 ninja.setPort(8080);
 ninja.setWebRoot( "www");
