@@ -1,10 +1,19 @@
+/*  -----------------------------------------------
+Startup on an IBMi:
+Or submitted:
+SBMJOB CMD(QSH CMD('cd /www;export JAVA_HOME=/QopenSys/QIBM/ProdData/JavaVM/jdk80/32bit;java -jar ninjadb.jar     
+             www/startup.js'))                                   
+JOB(NINJA)                                                
+JOBQ(QSYSNOMAX)      
+*/           
+
 // -----------------------------------------------
 // This is a super simple web server 
 // the "router" is simply serving static files
 // -----------------------------------------------
 
 // Always configure as the very first: 
-ninja.setPort(8080);
+ninja.setPort(8082);
 ninja.setWebRoot( "/users/nli/Desktop/ext-6.0.0");
 ninja.setAppRoot( "www");
 

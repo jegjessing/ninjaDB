@@ -57,7 +57,7 @@ function router(req, response) {
 // -----------------------------------------------
 var routs = { 
 
-	"/helloInline" : {
+	"/helloworld" : {
 		get  : function(req, resp) {
     
     		var out = resp.getWriter();
