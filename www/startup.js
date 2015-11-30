@@ -12,20 +12,21 @@ JOBQ(QSYSNOMAX)
 
 -------------------------------------------------- */
 
-/* Define nija config before anything else*/
-ninja.setPort(8080);
-ninja.setWebRoot( "www");
-ninja.setAppRoot( "www");
+/* Define ninja config before anything else*/
+ninja.sys.setPort(8082);
+ninja.sys.setWebRoot( "www");
+ninja.sys.setAppRoot( "www");
 
-var con = ninja.dbConnect (
- "com.ibm.as400.access.AS400JDBCDriver",
- "jdbc:as400:DKSRV206",
- "DEMO",
- "demo"
-);
+var console = require('console.js');
+
+var con = ninja.db.connect ({
+	driver  : "com.ibm.as400.access.AS400JDBCDriver",
+	server  : "jdbc:as400:DKSRV206",
+	user    : "DEMO",
+	password: "demo"		
+});
 
 // Require modules: 
-var console = require('console.js');
 
 console.log("Starting up");
 // -----------------------------------------------
@@ -89,7 +90,7 @@ var routs = {
     
 	"/": { 
 		get  : function(req, response) {
-    		ninja.serveFile("/index.html", response);
+    		ninja.sys.serveFile("/index.html", response);
 		}
     },
     
@@ -103,7 +104,7 @@ var routs = {
     
 	"*" : {
 		get  : function(req, response) {
-			ninja.serveFile(req.getRequestURI(), response);
+			ninja.sys.serveFile(req.getRequestURI(), response);
 		}
     },
     

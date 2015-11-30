@@ -10,8 +10,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -25,6 +28,13 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.webapp.WebAppContext;
+// FastCGI interface:
+// https://eclipse.googlesource.com/jetty/org.eclipse.jetty.project/+/fbbe2426e50f40a884d253f189df317494341c33/jetty-fcgi/fcgi-proxy/src/test/java/org/eclipse/jetty/fcgi/proxy/WordPressSPDYFastCGIProxyServer.java
+import org.eclipse.jetty.fcgi.server.proxy.FastCGIProxyServlet;
 
  
 public class NinjaDB extends AbstractHandler
@@ -36,10 +46,10 @@ public class NinjaDB extends AbstractHandler
 	static String approot = "./"; 
 	static String defaultDoc = "index.html"; 
 	
+	
 	// class globals
 	static ScriptEngine engine;
 	static Invocable startup;
-	//static Connection con;
 	
 	public static String fileExtention (String fileName) {
 		String extension = "";
@@ -57,6 +67,7 @@ public class NinjaDB extends AbstractHandler
 		return  extension;
 	}
 	
+	// Simple hardcoded for now !! Todo!! load mime table
 	public static String getMimeForResource  (String rcs) {
 		String ext = fileExtention(rcs);
 		if (ext.equals("js")) {
@@ -82,7 +93,7 @@ public class NinjaDB extends AbstractHandler
 		OutputStream os = null;
 		PrintWriter out = null;
 		
-		// TODO: add roules for default documents
+		// TODO: add rules for default documents
 		if (rcs.endsWith("/")) {
 			rcs += defaultDoc;
 		}
@@ -129,7 +140,6 @@ public class NinjaDB extends AbstractHandler
     	
     }
 	
-	
        
     public void handle(String target,
             Request baseRequest,
@@ -141,11 +151,10 @@ public class NinjaDB extends AbstractHandler
 		response.setStatus(HttpServletResponse.SC_OK);
 		baseRequest.setHandled(true);
 		
-		PrintWriter out = null; // response.getWriter();
-		String rcs  = request.getRequestURI();// ; getPathTranslated();// request.getQueryString();
+		String rcs  = request.getRequestURI();
 		
-		String qrystr = request.getQueryString();
-		System.out.println(rcs );
+		// String qrystr = request.getQueryString();
+		System.out.println(rcs);
 		 
 		try {
 			Object p = startup.invokeFunction("router", request, response);
@@ -156,34 +165,45 @@ public class NinjaDB extends AbstractHandler
 	
 	}
  
+    
+    
     public static void main(String[] args) throws Exception
     {
-    	
     	 
     	NinjaDB ninja = new NinjaDB();
     	ninja = new NinjaDB();
         engine = new ScriptEngineManager().getEngineByName("nashorn");
     	
-        // will not work ... :(
-        // engine.put("ninja", ninja);
-        
         // Pre-defined mapping of build in classes
-        engine.eval("var ninja = Packages.ninjaDB.NinjaDB;var require = ninja.require;");
+        // TODO !!! put in config file
+        engine.eval(
+        		"var ninja={};"+
+        		"ninja.sys = Packages.ninjaDB.NinjaDB;" +
+        		"var require = ninja.sys.require;" +
+        		"ninja.db={};" +		
+        		"ninja.db.connect = function (config) {" +
+        		"	return ninja.sys.dbConnect(" +
+        		"		config.driver, " +
+        		"		config.server, "+ 
+        		"		config.user," + 
+        		"		config.password " +
+        		"	);" +
+        		"};"	
+        );
         
-        // deafult to "startup.js if none is given
+        // deafault to "startup.js if none is given
         String startupFile = args.length >= 1 ? args[0] : "startup.js";  
         
         engine.eval("load('" + startupFile + "');");
         
-        // engine.eval(new java.io.FileReader("./" + startflr + "/script.js"));
         startup  = (Invocable) engine;
        
     	Server server = new Server(port);
-        server.setHandler(ninja);
-        
+    	server.setHandler(ninja);
         server.start();
         server.join();
     }
+        
 
     public static void setPort  (String n) 
     {

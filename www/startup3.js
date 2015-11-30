@@ -13,18 +13,18 @@ JOBQ(QSYSNOMAX)
 // -----------------------------------------------
 
 // Always configure as the very first: 
-ninja.setPort(8082);
-ninja.setWebRoot( "/users/nli/Desktop/ext-6.0.0");
-ninja.setAppRoot( "www");
+ninja.sys.setPort(8082);
+ninja.sys.setWebRoot( "/users/nli/ext-6.0.0");
+ninja.sys.setAppRoot( "www");
 
 // Now the path is set for requirement:
 var console = require('console.js');
-console.log("Starting up");
+console.log("Starting up - extjs demo");
 
 // -----------------------------------------------
 // "router" is the thread callback from the server
 // this sample handles all 
 // -----------------------------------------------
 function router(req, response) {
-	ninja.serveFile(req.getRequestURI(), response);
+	ninja.sys.serveFile(req.getRequestURI(), response);
 }
