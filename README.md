@@ -9,7 +9,7 @@ In the console you can see the startup messages form "startup.js" - so far the j
 
 from the URL try it as:
 
-	http://loopback:8080  
+	http://loopback:8082  
 
 Which is displaying the index.html 
 
